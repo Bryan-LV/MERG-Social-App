@@ -1,0 +1,20 @@
+{
+  "name": "social-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "server": "nodemon server"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^2.13.1",
+    "bcrypt": "^4.0.1",
+    "concurrently": "^5.2.0",
+    "dotenv": "^8.2.0",
+    "graphql": "^15.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.13"
+  }
+}
