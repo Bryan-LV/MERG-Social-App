@@ -5,7 +5,11 @@ require('dotenv').config();
 const typeDefs = require('./GraphQL/typeDefs')
 const resolvers = require('./GraphQL/resolvers');
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: ({ req }) => ({ req })
+});
 
 setupServer = async () => {
   try {

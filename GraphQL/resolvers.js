@@ -1,4 +1,4 @@
-const { UserInputError } = require('apollo-server');
+const { UserInputError, ApolloError } = require('apollo-server');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -6,6 +6,7 @@ require('dotenv').config();
 const User = require('../Models/User.model')
 const Post = require('../Models/Post.model')
 const { loginValidator, registerValidator } = require('../utils/validators');
+const checkAuth = require('../utils/checkAuth');
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -21,11 +22,22 @@ const generateToken = (user) => {
 
 const resolvers = {
   Query: {
-    getPosts: async () => await Post.find()
+    getPosts: async () => await Post.find(),
+    getPost: async (_, args) => {
+      try {
+        let post = await Post.findById(args.id)
+        if (!post) {
+          throw new ApolloError('Could not find the post you are looking for');
+        }
+        return post;
+      } catch (error) {
+        throw new ApolloError('Could not find the post you are looking for', error);
+      }
+    }
   },
 
   Mutation: {
-    // Register mutation
+    ///////////////////// Register mutation /////////////////////
     register: async (_, { registerInput: { username, email, password, confirmPassword } }) => {
       // validate inputs
       const { errors, valid } = registerValidator({ username, email, password, confirmPassword });
@@ -63,7 +75,7 @@ const resolvers = {
         token
       };
     },
-    // Login mutation
+    ///////////////////// Login mutation /////////////////////
     login: async (_, { loginInput: { username, password } }) => {
       // validate inputs
       const { errors, valid } = loginValidator({ username, password });
@@ -79,8 +91,8 @@ const resolvers = {
       // validate password
       const verifyPassword = await bcrypt.compare(password, user.password)
       if (!verifyPassword) {
-        errors.general = 'Wrong crendetials';
-        throw new UserInputError('Wrong crendetials', { errors });
+        errors.general = 'Wrong credentials';
+        throw new UserInputError('Wrong credentials', { errors });
       }
       // generate token
       const token = generateToken(user);
@@ -90,6 +102,21 @@ const resolvers = {
         id: user._id,
         token
       }
+    },
+    ///////////////////// Create Post /////////////////////
+    createPost: async (_, { postInput: { body } }, context) => {
+      // check authentication
+      const user = checkAuth(context);
+      // create post 
+      let post = new Post({
+        body: body,
+        user: user.id,
+        username: user.username,
+        createdAt: new Date().toISOString()
+      })
+      // save post
+      const newPost = await post.save();
+      return newPost;
     }
   }
 }
