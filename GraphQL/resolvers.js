@@ -1,4 +1,4 @@
-const { UserInputError, ApolloError } = require('apollo-server');
+const { UserInputError, ApolloError, AuthenticationError } = require('apollo-server');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -22,7 +22,13 @@ const generateToken = (user) => {
 
 const resolvers = {
   Query: {
-    getPosts: async () => await Post.find(),
+    getPosts: async () => {
+      try {
+        return await Post.find();
+      } catch (error) {
+        throw new ApolloError('Posts could not be retrieved');
+      }
+    },
     getPost: async (_, args) => {
       try {
         let post = await Post.findById(args.id)
@@ -117,6 +123,54 @@ const resolvers = {
       // save post
       const newPost = await post.save();
       return newPost;
+    },
+    ///////////////////// Delete Post /////////////////////
+    deletePost: async (_, args, context) => {
+      // check authentication
+      const user = checkAuth(context);
+      try {
+        // find post 
+        let post = await Post.findById(args.postID);
+        if (!post) throw new ApolloError('Post not found');
+        // check if user id is equal to the user id of the post
+        if (user.username !== post.username) throw new AuthenticationError('User is not authorized to delete this post');
+        await post.remove();
+        return { message: 'Post deleted' };
+      } catch (error) {
+        throw new ApolloError(error);
+      }
+    },
+    ///////////////////// Create Comment /////////////////////
+    createComment: async (_, { commentInput: { body, postID } }, context) => {
+      // check authentication
+      const user = checkAuth(context);
+      // validate body input
+      if (body.trim() === '') throw new UserInputError('Comment can not be submitted empty');
+      // find post
+      let post = await Post.findById(postID);
+      if (!post) throw new ApolloError('Post could not be found');
+      // add comment to post
+      post.comments.unshift({
+        body,
+        username: user.username,
+        createdAt: new Date().toISOString()
+      })
+      await post.save();
+      return post
+    },
+    ///////////////////// Delete Comment /////////////////////
+    deleteComment: async (_, { deleteCommentInput: { postID, commentID } }, context) => {
+      // check authentication
+      const user = checkAuth(context);
+      // find post
+      let post = await Post.findById(postID);
+      if (!post) throw new ApolloError('Post could not be found');
+      // check if user owns comment (username of commentID === username of user doing the action)
+      const comment = post.comments.findIndex(comment => comment.id === commentID && comment.username === user.username);
+      // remove item from array
+      post.comments.splice(comment, 1);
+      await post.save();
+      return post
     }
   }
 }

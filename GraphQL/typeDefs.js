@@ -3,7 +3,7 @@ const { gql } = require('apollo-server');
 const typeDefs = gql`
 
   type Query {
-    getPosts: [Post!]!
+    getPosts: [Post]!
     getPost(id: ID!): Post
   }
 
@@ -11,6 +11,9 @@ const typeDefs = gql`
     register(registerInput: RegisterInput): User!
     login(loginInput: LoginInput): User!
     createPost(postInput: PostInput): Post!
+    deletePost(postID: ID!): Response!
+    createComment(commentInput: CommentInput!): Post!
+    deleteComment(deleteCommentInput: DeleteCommentInput!): Post!
   }
 
   type User {
@@ -26,6 +29,23 @@ const typeDefs = gql`
     body: String!
     username: String!
     createdAt: String!
+    comments: [Comment]!
+  }
+
+  type Comment {
+    id: ID!
+    body: String!
+    username: String!
+    createdAt: String!
+  }
+
+  type Like {
+    username: String!
+    createdAt: String!
+  }
+
+  type Response {
+    message: String!
   }
 
   input RegisterInput { 
@@ -44,6 +64,15 @@ const typeDefs = gql`
     body: String!
   }
 
+  input CommentInput {
+    body: String!
+    postID: ID!
+  }
+
+  input DeleteCommentInput {
+    postID: ID!
+    commentID: ID!
+  }
 
 `
 
