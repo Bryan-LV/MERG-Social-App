@@ -171,8 +171,31 @@ const resolvers = {
       post.comments.splice(comment, 1);
       await post.save();
       return post
+    },
+    ///////////////////// Toggle Like Post /////////////////////
+    likePost: async (_, { likeInput }, context) => {
+      // check authentication
+      const user = checkAuth(context);
+      // find post
+      let post = await Post.findById(likeInput.postID);
+      if (!post) throw new ApolloError('Post could not be found');
+      // condition: user liked post ? remove like : like post
+      const findLike = post.likes.findIndex(like => like.username === user.username);
+      if (findLike === -1) {
+        post.likes.push({
+          username: user.username,
+          createdAt: new Date().toISOString()
+        })
+      } else {
+        // unlike post
+        post.likes.splice(findLike, 1);
+      }
+      await post.save();
+      return post;
     }
   }
 }
 
 module.exports = resolvers
+
+

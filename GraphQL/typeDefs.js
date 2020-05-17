@@ -14,6 +14,7 @@ const typeDefs = gql`
     deletePost(postID: ID!): Response!
     createComment(commentInput: CommentInput!): Post!
     deleteComment(deleteCommentInput: DeleteCommentInput!): Post!
+    likePost(likeInput: LikeInput!): Post!
   }
 
   type User {
@@ -30,6 +31,7 @@ const typeDefs = gql`
     username: String!
     createdAt: String!
     comments: [Comment]!
+    likes: [Like]!
   }
 
   type Comment {
@@ -40,6 +42,7 @@ const typeDefs = gql`
   }
 
   type Like {
+    id: ID!
     username: String!
     createdAt: String!
   }
@@ -72,6 +75,10 @@ const typeDefs = gql`
   input DeleteCommentInput {
     postID: ID!
     commentID: ID!
+  }
+
+  input LikeInput {
+    postID: ID!
   }
 
 `
