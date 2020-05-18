@@ -5,6 +5,7 @@ const typeDefs = gql`
   type Query {
     getPosts: [Post]!
     getPost(id: ID!): Post
+    checkAuth(token:String!): Response!
   }
 
   type Mutation {
@@ -49,6 +50,7 @@ const typeDefs = gql`
 
   type Response {
     message: String!
+    isValid: Boolean
   }
 
   input RegisterInput { 

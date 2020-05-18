@@ -1,0 +1,42 @@
+.container {
+  max-width: 1400px;
+  margin: auto;
+}
+
+.home {
+  padding: 30px;
+  display: grid;
+  gap: 15px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.card-post {
+  border-radius: 6px;
+  padding: 20px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.created-at {
+  font-size: 14px;
+  color: #9a9a9a;
+}
+
+.card-post-meta {
+  display: flex;
+  align-items: center;
+}
+
+.icon-box {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 4px;
+}
+
+.icon {
+  width: 16px;
+}
+
+.icon-count {
+  padding-left: 5px;
+}

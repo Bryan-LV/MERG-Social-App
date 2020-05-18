@@ -1,0 +1,29 @@
+.form {
+  max-width: 95%;
+  margin: auto;
+  padding: 30px;
+}
+
+label {
+  display: block;
+  padding-bottom: 5px;
+}
+
+.form-inputs {
+  padding: 7px 5px;
+  border-radius: 4px;
+  border: 1px solid #999;
+  margin-bottom: 5px;
+}
+
+input::placeholder {
+  font-size: 14px;
+}
+
+.button {
+  padding: 12px 28px;
+  display: block;
+  border: 1px solid #999;
+  border-radius: 5px;
+  font-size: 15px;
+}

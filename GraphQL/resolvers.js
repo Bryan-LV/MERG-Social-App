@@ -39,6 +39,21 @@ const resolvers = {
       } catch (error) {
         throw new ApolloError('Could not find the post you are looking for', error);
       }
+    },
+    checkAuth: async (_, args) => {
+      try {
+        let token = args.token;
+        let verifyToken = jwt.verify(token, process.env.SECRET_KEY);
+        return {
+          isValid: true,
+          message: 'User is authenticated'
+        }
+      } catch (error) {
+        return {
+          isValid: false,
+          message: 'Token is not valid'
+        }
+      }
     }
   },
 
